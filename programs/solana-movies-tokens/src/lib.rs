@@ -67,6 +67,11 @@ pub mod solana_movies_tokens {
         msg!("Description: {}", description);
         msg!("Rating: {}", rating);
 
+        if rating > 5 || rating < 1 {
+            msg!("Rating cannot be higher than 5");
+            return err!(ErrorCode::InvalidRating);
+        }
+
         let movie_review = &mut ctx.accounts.movie_review;
         movie_review.rating = rating;
         movie_review.description = description;
@@ -75,6 +80,40 @@ pub mod solana_movies_tokens {
     }
 
     pub fn close(_ctx: Context<Close>) -> Result<()> {
+        Ok(())
+    }
+
+    pub fn add_comment(ctx: Context<AddComment>, comment: String) -> Result<()> {
+        msg!("Comment Account Created");
+        msg!("Comment: {}", comment);
+
+        let movie_comment = &mut ctx.accounts.movie_comment;
+        let movie_comment_counter = &mut ctx.accounts.movie_comment_counter;
+
+        movie_comment.review = ctx.accounts.movie_review.key();
+        movie_comment.commenter = ctx.accounts.initializer.key();
+        movie_comment.comment = comment;
+        movie_comment.count = movie_comment_counter.counter;
+
+        movie_comment_counter.counter += 1;
+
+        let seeds = &["mint".as_bytes(), &[*ctx.bumps.get("reward_mint").unwrap()]];
+
+        let signer = [&seeds[..]];
+
+        let cpi_ctx = CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            token::MintTo {
+                mint: ctx.accounts.reward_mint.to_account_info(),
+                to: ctx.accounts.token_account.to_account_info(),
+                authority: ctx.accounts.reward_mint.to_account_info(),
+            },
+            &signer,
+        );
+
+        token::mint_to(cpi_ctx, 5000000)?;
+        msg!("Minted Tokens");
+
         Ok(())
     }
 
@@ -185,6 +224,52 @@ pub struct UpdateMovieReview<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(comment:String)]
+pub struct AddComment<'info> {
+    #[account(
+        init,
+        seeds = [movie_review.key().as_ref(), &movie_comment_counter.counter.to_le_bytes()],
+        bump,
+        payer = initializer,
+        space = 8 + 32 + 32 + 4 + comment.len() + 8
+    )]
+    pub movie_comment: Account<'info, MovieComment>,
+    pub movie_review: Account<'info, MovieAccountState>,
+    #[account(
+        mut,
+        seeds = ["counter".as_bytes(), movie_review.key().as_ref()],
+        bump,
+    )]
+    pub movie_comment_counter: Account<'info, MovieCommentCounter>,
+    #[account(mut,
+        seeds = ["mint".as_bytes().as_ref()],
+        bump
+    )]
+    pub reward_mint: Account<'info, Mint>,
+    #[account(
+        init_if_needed,
+        payer = initializer,
+        associated_token::mint = reward_mint,
+        associated_token::authority = initializer
+    )]
+    pub token_account: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub rent: Sysvar<'info, Rent>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct Close<'info> {
+    #[account(mut, close = reviewer, has_one = reviewer)]
+    movie_review: Account<'info, MovieAccountState>,
+    #[account(mut)]
+    reviewer: Signer<'info>,
+}
+
+#[derive(Accounts)]
 pub struct CreateTokenReward<'info> {
     #[account(
         init,
@@ -210,13 +295,7 @@ pub struct CreateTokenReward<'info> {
     pub token_metadata_program: AccountInfo<'info>,
 }
 
-#[derive(Accounts)]
-pub struct Close<'info> {
-    #[account(mut, close = reviewer, has_one = reviewer)]
-    movie_review: Account<'info, MovieAccountState>,
-    #[account(mut)]
-    reviewer: Signer<'info>,
-}
+
 
 #[account]
 pub struct MovieAccountState {
@@ -224,6 +303,19 @@ pub struct MovieAccountState {
     pub rating: u8,          // 1
     pub title: String,       // 4 + len()
     pub description: String, // 4 + len()
+}
+
+#[account]
+pub struct MovieCommentCounter {
+    pub counter: u64,
+}
+
+#[account]
+pub struct MovieComment {
+    pub review: Pubkey,    // 32
+    pub commenter: Pubkey, // 32
+    pub comment: String,   // 4 + len()
+    pub count: u64,        // 8
 }
 
 #[error_code]
