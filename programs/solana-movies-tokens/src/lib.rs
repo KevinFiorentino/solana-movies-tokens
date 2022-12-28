@@ -224,6 +224,14 @@ pub struct UpdateMovieReview<'info> {
 }
 
 #[derive(Accounts)]
+pub struct Close<'info> {
+    #[account(mut, close = reviewer, has_one = reviewer)]
+    movie_review: Account<'info, MovieAccountState>,
+    #[account(mut)]
+    reviewer: Signer<'info>,
+}
+
+#[derive(Accounts)]
 #[instruction(comment:String)]
 pub struct AddComment<'info> {
     #[account(
@@ -259,14 +267,6 @@ pub struct AddComment<'info> {
     pub associated_token_program: Program<'info, AssociatedToken>,
     pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,
-}
-
-#[derive(Accounts)]
-pub struct Close<'info> {
-    #[account(mut, close = reviewer, has_one = reviewer)]
-    movie_review: Account<'info, MovieAccountState>,
-    #[account(mut)]
-    reviewer: Signer<'info>,
 }
 
 #[derive(Accounts)]
