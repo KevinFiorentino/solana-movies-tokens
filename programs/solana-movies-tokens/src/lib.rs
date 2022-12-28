@@ -21,11 +21,38 @@ pub mod solana_movies_tokens {
         msg!("Description: {}", description);
         msg!("Rating: {}", rating);
 
+        if rating > 5 || rating < 1 {
+            msg!("Rating cannot be higher than 5");
+            return err!(ErrorCode::InvalidRating);
+        }
+
         let movie_review = &mut ctx.accounts.movie_review;
         movie_review.reviewer = ctx.accounts.initializer.key();
         movie_review.title = title;
         movie_review.rating = rating;
         movie_review.description = description;
+
+        msg!("Movie Comment Counter Account Created");
+        let movie_comment_counter = &mut ctx.accounts.movie_comment_counter;
+        movie_comment_counter.counter = 0;
+        msg!("Counter: {}", movie_comment_counter.counter);
+
+        let seeds = &["mint".as_bytes(), &[*ctx.bumps.get("reward_mint").unwrap()]];
+
+        let signer = [&seeds[..]];
+
+        let cpi_ctx = CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            token::MintTo {
+                mint: ctx.accounts.reward_mint.to_account_info(),
+                to: ctx.accounts.token_account.to_account_info(),
+                authority: ctx.accounts.reward_mint.to_account_info(),
+            },
+            &signer,
+        );
+
+        token::mint_to(cpi_ctx, 10000000)?;
+        msg!("Minted Tokens");
         Ok(())
     }
 
@@ -99,6 +126,8 @@ pub mod solana_movies_tokens {
     }
 }
 
+
+
 #[derive(Accounts)]
 #[instruction(title:String, description:String)]
 pub struct AddMovieReview<'info> {
@@ -110,8 +139,31 @@ pub struct AddMovieReview<'info> {
         space = 8 + 32 + 1 + 4 + title.len() + 4 + description.len()
     )]
     pub movie_review: Account<'info, MovieAccountState>,
+    #[account(
+        init,
+        seeds = ["counter".as_bytes(), movie_review.key().as_ref()],
+        bump,
+        payer = initializer,
+        space = 8 + 8
+    )]
+    pub movie_comment_counter: Account<'info, MovieCommentCounter>,
+    #[account(mut,
+        seeds = ["mint".as_bytes().as_ref()],
+        bump
+    )]
+    pub reward_mint: Account<'info, Mint>,
+    #[account(
+        init_if_needed,
+        payer = initializer,
+        associated_token::mint = reward_mint,
+        associated_token::authority = initializer
+    )]
+    pub token_account: Account<'info, TokenAccount>,
     #[account(mut)]
     pub initializer: Signer<'info>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,
 }
 
