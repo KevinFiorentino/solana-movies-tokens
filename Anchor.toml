@@ -2,14 +2,14 @@
 seeds = false
 skip-lint = false
 
-[programs.localnet]
-solana_movies_tokens = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+[programs.devnet]
+solana_movies_tokens = "A54JaBpNgAnocNmK3Axa9Teq5SxrAXTmVHgM5NV7hZrX"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "/home/kevin/.config/solana/id.json"
 
 [scripts]
