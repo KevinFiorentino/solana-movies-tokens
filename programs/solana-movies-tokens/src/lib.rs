@@ -11,7 +11,7 @@ use mpl_token_metadata::{
     instruction::create_metadata_accounts_v3, pda::find_metadata_account, ID as MetadataID,
 };
 
-declare_id!("zTaCpP3fLPMErJib4KLtfxMa5GT7YDmyxYZdddeCeDi");
+declare_id!("EjUKYk8xsG78gZTkR6EqjKJADjyqSiTsr6CtajCBmKrT");
 
 #[program]
 pub mod solana_movies_tokens {
@@ -47,7 +47,7 @@ pub mod solana_movies_tokens {
                     &[*ctx.bumps.get("mint").unwrap()],
                 ]]
             ),
-            10*10^6
+            1000000    // 1 token
         )?;
 
         msg!("Minted tokens");
@@ -81,8 +81,7 @@ pub mod solana_movies_tokens {
         name: String,
         symbol: String,
     ) -> Result<()> {
-        msg!("Token mint initialized");
-
+        
         let seeds = &["mint".as_bytes(), &[*ctx.bumps.get("mint").unwrap()]];
         let signer = [&seeds[..]];
 
@@ -119,18 +118,7 @@ pub mod solana_movies_tokens {
             &signer,
         )?;
 
-        mint_to(
-            CpiContext::new_with_signer(
-                ctx.accounts.token_program.to_account_info(),
-                MintTo {
-                    authority: ctx.accounts.mint.to_account_info(),
-                    to: ctx.accounts.token_account.to_account_info(),
-                    mint: ctx.accounts.mint.to_account_info(),
-                },
-                &signer,
-            ),
-            1,
-        )?;
+        msg!("Token mint initialized");
 
         Ok(())
     }
@@ -214,21 +202,13 @@ pub struct InitializeMint<'info> {
     /// CHECK: Using "address" constraint to validate metadata account address
     #[account(
         mut,
-        address=find_metadata_account(&mint.key()).0
+        address = find_metadata_account(&mint.key()).0
     )]
     pub metadata: UncheckedAccount<'info>,
-    #[account(
-        init_if_needed,
-        payer = user,
-        associated_token::mint = mint,
-        associated_token::authority = user
-    )]
-    pub token_account: Account<'info, TokenAccount>,
     #[account(mut)]
     pub user: Signer<'info>,
     pub token_program: Program<'info, Token>,
     pub token_metadata_program: Program<'info, TokenMetaData>,
-    pub associated_token_program: Program<'info, AssociatedToken>,
     pub rent: Sysvar<'info, Rent>,
     pub system_program: Program<'info, System>,
 }

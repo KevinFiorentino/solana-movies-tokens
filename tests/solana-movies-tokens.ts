@@ -18,7 +18,7 @@ describe("Solana Movies Tokens", () => {
 
   const nft = {
     uri: "https://arweave.net/OwXDf7SM6nCVY2cvQ4svNjtV7WBTz3plbI4obN9JNkk",
-    name: "Solana Movies and Tokens",
+    name: "Movies and Tokens",
     symbol: "SMT",
   }
 
@@ -27,10 +27,10 @@ describe("Solana Movies Tokens", () => {
     program.programId
   )
 
-  const tokenAccount = getAssociatedTokenAddressSync(
+  /* const tokenAccount = getAssociatedTokenAddressSync(
     mintPDA,
     provider.wallet.publicKey
-  )
+  ) */
 
   it("Initialize Token Mint", async () => {
 
@@ -41,14 +41,14 @@ describe("Solana Movies Tokens", () => {
       .accounts({
         mint: mintPDA,
         metadata: metadataPDA,
-        tokenAccount: tokenAccount,
+        // tokenAccount: tokenAccount,
         user: provider.wallet.publicKey,
         tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
       })
       .rpc()
 
-    const account = await getAccount(provider.connection, tokenAccount)
-    console.log(account)
+    /* const account = await getAccount(provider.connection, tokenAccount)
+    console.log(account) */
   })
 
 });
