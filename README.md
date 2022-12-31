@@ -2,6 +2,9 @@
 
 Solana program to create movie reviews and earn tokens.
 
+- [See online](https://sol-movie-reviews.vercel.app/)
+- [See UI](https://github.com/KevinFiorentino/solana-movies-tokens-ui)
+
 ### Fund wallet
 
 - `solana config set --url devnet`
