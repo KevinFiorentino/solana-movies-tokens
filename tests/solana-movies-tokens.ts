@@ -27,11 +27,6 @@ describe("Solana Movies Tokens", () => {
     program.programId
   )
 
-  /* const tokenAccount = getAssociatedTokenAddressSync(
-    mintPDA,
-    provider.wallet.publicKey
-  ) */
-
   it("Initialize Token Mint", async () => {
 
     const metadataPDA = await findMetadataPda(mintPDA)
@@ -41,14 +36,10 @@ describe("Solana Movies Tokens", () => {
       .accounts({
         mint: mintPDA,
         metadata: metadataPDA,
-        // tokenAccount: tokenAccount,
         user: provider.wallet.publicKey,
         tokenMetadataProgram: TOKEN_METADATA_PROGRAM_ID,
       })
       .rpc()
-
-    /* const account = await getAccount(provider.connection, tokenAccount)
-    console.log(account) */
   })
 
 });
