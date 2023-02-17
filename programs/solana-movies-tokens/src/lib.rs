@@ -98,21 +98,21 @@ pub mod solana_movies_tokens {
         invoke_signed(
             &create_metadata_accounts_v3(
                 ctx.accounts.token_metadata_program.key(),       // token metadata program
-                ctx.accounts.metadata.key(),               // metadata account PDA for mint
-                ctx.accounts.mint.key(),                               // mint account
-                ctx.accounts.mint.key(),                     // mint authority
-                ctx.accounts.user.key(),                              // payer for transaction
-                ctx.accounts.mint.key(),                   // update authority
-                name,                                                       // name
-                symbol,                                                     // symbol
-                uri,                                                        // uri (offchain metadata)
-                None,                                              // (optional) creators
-                0,                                  // seller free basis points
-                true,                            // (bool) update authority is signer
+                ctx.accounts.metadata.key(),                     // metadata account PDA for mint
+                ctx.accounts.mint.key(),                         // mint account
+                ctx.accounts.mint.key(),                         // mint authority
+                ctx.accounts.user.key(),                         // payer for transaction
+                ctx.accounts.mint.key(),                         // update authority
+                name,                                            // name
+                symbol,                                          // symbol
+                uri,                                             // uri (offchain metadata)
+                None,                                            // (optional) creators
+                0,                                               // seller free basis points
+                true,                                            // (bool) update authority is signer
                 true,                                            // (bool) is mutable
                 None,                                            // (optional) collection
-                None,                                                  // (optional) uses
-                None,                                    // (optional) collection details
+                None,                                            // (optional) uses
+                None,                                            // (optional) collection details
             ),
             account_info.as_slice(),
             &signer,
