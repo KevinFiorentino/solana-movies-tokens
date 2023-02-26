@@ -1,5 +1,5 @@
 import * as anchor from "@project-serum/anchor";
-import { Program } from "@project-serum/anchor";
+import { Program, BN } from "@project-serum/anchor";
 import { SolanaMoviesTokens } from "../target/types/solana_movies_tokens";
 import { Metaplex } from '@metaplex-foundation/js';
 import { expect } from "chai";
@@ -15,11 +15,10 @@ describe("Solana Movies Tokens", () => {
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s"
   )
 
-  const nft = {
-    uri: "https://arweave.net/OwXDf7SM6nCVY2cvQ4svNjtV7WBTz3plbI4obN9JNkk",
-    name: "Movies and Tokens",
-    symbol: "SMT",
-  }
+  const uri = 'https://arweave.net/OwXDf7SM6nCVY2cvQ4svNjtV7WBTz3plbI4obN9JNkk';
+  const name = 'Movies and Tokens';
+  const symbol = 'SMT';
+  const decimals = 6;
 
   const [mintPDA] = anchor.web3.PublicKey.findProgramAddressSync(
     [Buffer.from("mint")],
@@ -34,7 +33,7 @@ describe("Solana Movies Tokens", () => {
     const metadataPDA = metaplex.nfts().pdas().metadata({ mint: mintPDA });
 
     await program.methods
-      .initializeTokenMint(nft.uri, nft.name, nft.symbol)
+      .initializeTokenMint(uri, name, symbol, decimals)
       .accounts({
         mint: mintPDA,
         metadata: metadataPDA,

@@ -11,7 +11,7 @@ use mpl_token_metadata::{
     instruction::create_metadata_accounts_v3, pda::find_metadata_account, ID as MetadataID,
 };
 
-declare_id!("7VcowNzL6Vts3n2jQCoaJTWksFtCUe314TuunRwUpRwF");
+declare_id!("CfUigSE7puwu2YuTRKsxM1Cs5bFsMG2nvKsTDvp2bKmn");
 
 #[program]
 pub mod solana_movies_tokens {
@@ -80,6 +80,7 @@ pub mod solana_movies_tokens {
         uri: String,
         name: String,
         symbol: String,
+        _decimals: u8,
     ) -> Result<()> {
         
         let seeds = &["mint".as_bytes(), &[*ctx.bumps.get("mint").unwrap()]];
@@ -189,13 +190,19 @@ pub struct DeleteMovieReview<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(
+    uri: String,
+    name: String,
+    symbol: String,
+    decimals: u8,
+)]
 pub struct InitializeMint<'info> {
     #[account(
         init,
         seeds = [b"mint"],
         bump,
         payer = user,
-        mint::decimals = 6,
+        mint::decimals = decimals,
         mint::authority = mint,
     )]
     pub mint: Account<'info, Mint>,
