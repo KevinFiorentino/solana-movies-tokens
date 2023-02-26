@@ -1,8 +1,7 @@
 import * as anchor from "@project-serum/anchor";
-import { Program, BN } from "@project-serum/anchor";
+import { Program } from "@project-serum/anchor";
 import { SolanaMoviesTokens } from "../target/types/solana_movies_tokens";
 import { Metaplex } from '@metaplex-foundation/js';
-import { expect } from "chai";
 
 describe("Solana Movies Tokens", () => {
 
