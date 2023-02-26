@@ -1,8 +1,7 @@
 import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
-import { getAccount, getAssociatedTokenAddressSync } from "@solana/spl-token"
 import { SolanaMoviesTokens } from "../target/types/solana_movies_tokens";
-import { findMetadataPda } from "@metaplex-foundation/js"
+import { Metaplex } from '@metaplex-foundation/js';
 import { expect } from "chai";
 
 describe("Solana Movies Tokens", () => {
@@ -27,9 +26,12 @@ describe("Solana Movies Tokens", () => {
     program.programId
   )
 
+  // Only works in Devnet and the first time with the same Program ID
   it("Initialize Token Mint", async () => {
 
-    const metadataPDA = await findMetadataPda(mintPDA)
+    const metaplex = Metaplex.make(provider.connection);
+
+    const metadataPDA = metaplex.nfts().pdas().metadata({ mint: mintPDA });
 
     await program.methods
       .initializeTokenMint(nft.uri, nft.name, nft.symbol)

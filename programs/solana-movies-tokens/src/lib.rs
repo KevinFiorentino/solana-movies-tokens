@@ -11,7 +11,7 @@ use mpl_token_metadata::{
     instruction::create_metadata_accounts_v3, pda::find_metadata_account, ID as MetadataID,
 };
 
-declare_id!("EjUKYk8xsG78gZTkR6EqjKJADjyqSiTsr6CtajCBmKrT");
+declare_id!("7VcowNzL6Vts3n2jQCoaJTWksFtCUe314TuunRwUpRwF");
 
 #[program]
 pub mod solana_movies_tokens {

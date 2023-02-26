@@ -3,7 +3,7 @@ seeds = false
 skip-lint = false
 
 [programs.devnet]
-solana_movies_tokens = "EjUKYk8xsG78gZTkR6EqjKJADjyqSiTsr6CtajCBmKrT"
+solana_movies_tokens = "7VcowNzL6Vts3n2jQCoaJTWksFtCUe314TuunRwUpRwF"
 
 [registry]
 url = "https://api.apr.dev"

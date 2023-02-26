@@ -21,4 +21,4 @@ Solana program to create movie reviews and earn tokens.
 
 ### Initialize Token Mint
 
-- `anchor test --skip-build --skip-deploy` (only works the first time with the same Program ID)
+- `anchor test --skip-build --skip-deploy` (Only works in Devnet and the first time with the same Program ID)
